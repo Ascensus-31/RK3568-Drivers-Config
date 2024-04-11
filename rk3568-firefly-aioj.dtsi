@@ -145,6 +145,10 @@
     status = "okay";
 };
 
+&uart2 {
+	status = "okay";
+};
+
 &uart3 {
 	status = "okay";
 };
@@ -212,6 +216,10 @@
 	status = "okay";
 	reset-gpios = <&gpio3 RK_PD5 GPIO_ACTIVE_LOW>;
 	post-power-on-delay-ms = <100>;
+};
+
+&sdmmc0 {
+	status = "okay";
 };
 
 &sdmmc2 {
