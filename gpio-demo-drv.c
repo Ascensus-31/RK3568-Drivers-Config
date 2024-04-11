@@ -16,8 +16,8 @@
 #include <linux/platform_device.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
-#include </home/asc3nt/100ask_imx6ull-sdk/Linux-4.9.88/arch/arm64/boot/dts/include/dt-bindings/gpio/gpio.h>
-#include </home/asc3nt/100ask_imx6ull-sdk/Uboot-2018.03/arch/arm/dts/include/dt-bindings/pinctrl/rockchip.h>
+#include </home/asc3nt/proj02/rk356x_linux_release_v1.3.0b_20221213/kernel/include/dt-bindings/gpio/gpio.h>
+#include </home/asc3nt/proj02/rk356x_linux_release_v1.3.0b_20221213/kernel/include/dt-bindings/pinctrl/rockchip.h>
 
 #define GPIO_DEVICE_NAME "mygpio"
 #define GPIO_DEVICE_MINOR 0
