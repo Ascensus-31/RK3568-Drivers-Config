@@ -4,6 +4,10 @@
  * 为应用程序提供读写接口，可配置的GPIO数量。
  * ATTENTION:使用时注意根据总共的GPIO数量修改GPIO_SUB_COUNT
  * 同时注意根据设备树顺序添加write/read函数中的switch内容。
+ * 文件名：
+ * /dev: mygpio0, mygpio1
+ * /sys/class: my_gpio_class
+ * /sys/kernel/debug/gpio: gpios
  */
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -38,8 +42,6 @@ struct my_gpio_info {
 
 static struct my_gpio_info *gpio_info;  // 全局变量
 
-static DEFINE_MUTEX(gpio_mutex);  // 互斥锁
-
 static int mygpio_open(struct inode *inode, struct file *file) {
     printk("Open File:%s\n",file->f_path.dentry->d_iname);
     return 0;
@@ -52,8 +54,8 @@ static ssize_t mygpio_read(struct file *file, char __user *buffer, size_t length
     int idLen = strlen(file->f_path.dentry->d_iname);
     char gpio_id = file->f_path.dentry->d_iname[idLen-1] - '0';
     switch (gpio_id){
-        case 0:gpio_pin = 14;break;
-        case 1:gpio_pin = 6;break;
+        case 0:gpio_pin = 6;break;
+        case 1:gpio_pin = 14;break;
     }
     rValue = gpio_get_value(gpio_pin);
     if (rValue < 0) {
@@ -77,18 +79,14 @@ static ssize_t mygpio_write(struct file *file, const char *buffer, size_t length
     }
 
     switch (gpio_id){
-        case 0:gpio_pin = 14;break;
-        case 1:gpio_pin = 6;break;
+        case 0:gpio_pin = 6;break;
+        case 1:gpio_pin = 14;break;
     }
     gpio_info->gpio_input_value = wValue;
     gpio_info->gpio_pin = gpio_pin;
-    mutex_lock(&gpio_mutex);
     
     gpio_direction_output(gpio_info->gpio_pin, gpio_info->gpio_input_value);
     
-    mutex_unlock(&gpio_mutex);
-
-
     return length;
 
 }
@@ -112,14 +110,14 @@ static int my_gpio_probe(struct platform_device *pdev)
         dev_err(&pdev->dev, "devm_kzalloc failed!\n");
         return -ENOMEM;
     }
-    gpio = of_get_named_gpio_flags(my_gpio_node, "my-gpio", 0, &flag);/*此处获取的是设备树的gpio硬件编号*/
+    gpio = of_get_named_gpio_flags(my_gpio_node, "gpios", 0, &flag);/*此处获取的是设备树的gpio硬件编号*/
 
     if (!gpio_is_valid(gpio)) {
-        dev_err(&pdev->dev, "my-gpio: %d is invalid\n", gpio);
+        dev_err(&pdev->dev, "gpios: %d is invalid\n", gpio);
         return -ENODEV;
     }
-    if (gpio_request(gpio, "my-gpio")) {
-        dev_err(&pdev->dev, "my-gpio: %d request failed!\n", gpio);
+    if (gpio_request(gpio, "gpios")) {
+        dev_err(&pdev->dev, "gpios: %d request failed!\n", gpio);
         gpio_free(gpio);
         return -ENODEV;
     }
